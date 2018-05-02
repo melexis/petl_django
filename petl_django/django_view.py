@@ -65,12 +65,12 @@ def _get_model_field_names(model):
 
 
 def todjango(table, model, update=True, create=True, use_bulk_create=True, *args, **kwargs):
-    '''
+    """
     Given a table with appropriate headings create Django models.
-    '''
+    """
     assert issubclass(model, Model), 'Must be supplied a valid Django model class'
     table_iterator = iter(table)
-    table_headers = table_iterator.next()
+    table_headers = next(table_iterator)
 
     model_pk_field_name = model._meta.pk.name
     model_field_names = _get_model_field_names(model)
@@ -125,10 +125,10 @@ def todjango(table, model, update=True, create=True, use_bulk_create=True, *args
 
 
 def _get_django_objects(model):
-    '''
+    """
     Given a Django model class get all of the current records that match.
     This is better than django's bulk methods and has no upper limit.
-    '''
+    """
     model_name = model.__class__.__name__
     model_objects = [i for i in model.objects.all()]
     logger.debug('Found {} {} objects in DB'.format(len(model_objects), model_name))
@@ -136,8 +136,10 @@ def _get_django_objects(model):
 
 
 def _chunked_bulk_create(django_model_object, unsaved_models, chunk_size=None):
-    '''Create new models using bulk_create in batches of `chunk_size`.
-    This is designed to overcome a query size limitation in some databases'''
+    """
+    Create new models using bulk_create in batches of `chunk_size`.
+    This is designed to overcome a query size limitation in some databases
+    """
     if chunk_size is None:
         chunk_size = getattr(settings, 'BULK_CREATE_CHUNK_SIZE', 50)
     for i in range(0, len(unsaved_models), chunk_size):
